@@ -1,33 +1,69 @@
 import React, { useEffect, useRef, useState } from "react";
 import "./ImageSlideshow.css";
 
+// function normalizeImages(images) {
+//   if (!Array.isArray(images)) return [];
+
+//   return images
+//     .map((item) => {
+//       if (!item) return null;
+//       if (typeof item === "string") {
+//         return { url: item, topic: "", pageNumber: null, pdfName: "" };
+//       }
+
+//       if (typeof item === "object") {
+//         const rawPath = item.url || item.image_path || "";
+//         const url = rawPath
+//           ? rawPath.startsWith("/")
+//             ? rawPath
+//             : `/${rawPath}`
+//           : "";
+//         return {
+//           url,
+//           topic: item.topic || "",
+//           pageNumber: item.page_number || item.pageNumber || null,
+//           pdfName: item.pdf_name || item.pdfName || "",
+//           alt: item.alt || "",
+//         };
+//       }
+
+//       return null;
+//     })
+//     .filter((entry) => entry && entry.url);
+// }
+
 function normalizeImages(images) {
   if (!Array.isArray(images)) return [];
+
+  const backendUrl = import.meta.env.VITE_BACKEND_URL || "https://chatbotnd.iotfiysolutions.com";
 
   return images
     .map((item) => {
       if (!item) return null;
+
+      let rawUrl = "";
+
       if (typeof item === "string") {
-        return { url: item, topic: "", pageNumber: null, pdfName: "" };
+        rawUrl = item;
+      } else if (typeof item === "object") {
+        rawUrl = item.url || item.image_path || "";
       }
 
-      if (typeof item === "object") {
-        const rawPath = item.url || item.image_path || "";
-        const url = rawPath
-          ? rawPath.startsWith("/")
-            ? rawPath
-            : `/${rawPath}`
-          : "";
-        return {
-          url,
-          topic: item.topic || "",
-          pageNumber: item.page_number || item.pageNumber || null,
-          pdfName: item.pdf_name || item.pdfName || "",
-          alt: item.alt || "",
-        };
+      if (!rawUrl) return null;
+
+      // Full URL banao
+      let finalUrl = rawUrl;
+      if (!rawUrl.startsWith("http")) {
+        finalUrl = `${backendUrl}${rawUrl.startsWith('/') ? '' : '/'}${rawUrl}`;
       }
 
-      return null;
+      return {
+        url: finalUrl,
+        topic: item.topic || "",
+        pageNumber: item.page_number || item.pageNumber || null,
+        pdfName: item.pdf_name || item.pdfName || "",
+        alt: item.alt || "",
+      };
     })
     .filter((entry) => entry && entry.url);
 }
