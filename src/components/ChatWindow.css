@@ -1,0 +1,184 @@
+/* ═══ Chat Window ═══ */
+.chatwin {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+  z-index: 1;
+}
+
+/* ─── Messages Area ─── */
+.chatwin__messages {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 24px 16px 16px;
+  scroll-behavior: smooth;
+}
+
+.chatwin__messages-inner {
+  max-width: var(--max-chat-width);
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ─── Input Bar ─── */
+.chatwin__input-bar {
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
+  padding: 14px 16px;
+  border-top: 1px solid var(--border-subtle);
+  background: rgba(6, 6, 15, 0.88);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+}
+
+.chatwin__input-bar > * {
+  max-width: var(--max-chat-width);
+}
+
+.chatwin__input-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  justify-content: center;
+}
+
+.chatwin__input-wrap {
+  flex: 1;
+  max-width: var(--max-chat-width);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 16px;
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--border-light);
+  background: var(--bg-surface);
+  transition:
+    border-color var(--duration-normal) var(--ease-out),
+    box-shadow var(--duration-normal) var(--ease-out);
+}
+
+.chatwin__input-wrap:focus-within {
+  border-color: var(--accent-cyan);
+  box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.08), var(--shadow-glow);
+}
+
+.chatwin__input-icon {
+  font-size: 18px;
+  color: var(--text-muted);
+  flex-shrink: 0;
+  transition: color var(--duration-normal) ease;
+}
+
+.chatwin__input-wrap:focus-within .chatwin__input-icon {
+  color: var(--accent-cyan);
+}
+
+.chatwin__input {
+  flex: 1;
+  background: none;
+  border: none;
+  outline: none;
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 0.92rem;
+  line-height: 1.5;
+  resize: none;
+  max-height: 120px;
+}
+
+.chatwin__input::placeholder {
+  color: var(--text-muted);
+}
+
+.chatwin__input:disabled {
+  opacity: 0.5;
+}
+
+/* ─── Actions ─── */
+.chatwin__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Send button */
+.chatwin__send-btn {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  font-size: 19px;
+  color: #fff;
+  background: var(--gradient-brand);
+  box-shadow: 0 2px 14px rgba(0, 212, 255, 0.25);
+  transition:
+    transform var(--duration-fast) var(--ease-spring),
+    opacity var(--duration-normal) ease,
+    box-shadow var(--duration-normal) ease;
+}
+
+.chatwin__send-btn:hover:not(:disabled) {
+  transform: scale(1.08);
+  box-shadow: 0 4px 24px rgba(0, 212, 255, 0.35);
+}
+
+.chatwin__send-btn:active:not(:disabled) {
+  transform: scale(0.94);
+}
+
+.chatwin__send-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* ─── Empty State ─── */
+.chatwin__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 60px 24px;
+  text-align: center;
+  color: var(--text-secondary);
+  animation: fadeIn 0.6s ease;
+}
+
+.chatwin__empty-icon {
+  font-size: 48px;
+  background: var(--gradient-brand);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ─── Responsive ─── */
+@media (max-width: 600px) {
+  .chatwin__messages {
+    padding: 16px 10px 10px;
+  }
+
+  .chatwin__input-bar {
+    padding: 10px 10px;
+    gap: 8px;
+  }
+
+  .chatwin__input-wrap {
+    padding: 6px 12px;
+  }
+
+  .chatwin__send-btn {
+    width: 42px;
+    height: 42px;
+    font-size: 17px;
+  }
+}

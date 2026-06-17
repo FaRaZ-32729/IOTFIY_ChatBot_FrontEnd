@@ -1,0 +1,275 @@
+/* ─── CardScanner ─────────────────────────────────────────────── */
+
+.card-scanner {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(4, 4, 16, 0.88);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  padding: 16px;
+}
+
+.card-scanner__container {
+  background: linear-gradient(160deg, #0f0f1e 0%, #1a1a2e 100%);
+  border: 1px solid rgba(124, 58, 237, 0.3);
+  border-radius: 20px;
+  padding: 24px;
+  width: 100%;
+  max-width: 520px;
+  max-height: 90vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(124,58,237,0.15);
+}
+
+/* ── Title ──────────────────────────────────────────────────── */
+.card-scanner__title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #fff;
+  text-align: center;
+  margin: 0;
+  letter-spacing: 0.02em;
+}
+
+/* ── Preview area ───────────────────────────────────────────── */
+.card-scanner__preview {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #000;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.card-scanner__video,
+.card-scanner__captured {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* ── Card alignment guide overlay ───────────────────────────── */
+.card-scanner__guide {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card-scanner__guide-rect {
+  width: 82%;
+  height: 70%;
+  border: 2.5px solid rgba(124, 58, 237, 0.85);
+  border-radius: 10px;
+  box-shadow:
+    0 0 0 4000px rgba(0, 0, 0, 0.35),
+    inset 0 0 0 2px rgba(255, 255, 255, 0.06);
+  animation: guide-pulse 2s ease-in-out infinite;
+}
+
+@keyframes guide-pulse {
+  0%, 100% { border-color: rgba(124, 58, 237, 0.7); box-shadow: 0 0 0 4000px rgba(0,0,0,0.35), 0 0 12px rgba(124,58,237,0.3); }
+  50%       { border-color: rgba(0, 212, 255, 0.9);  box-shadow: 0 0 0 4000px rgba(0,0,0,0.35), 0 0 20px rgba(0,212,255,0.4); }
+}
+
+/* ── Countdown badge ────────────────────────────────────────── */
+.card-scanner__countdown {
+  position: absolute;
+  bottom: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(124, 58, 237, 0.85);
+  color: #fff;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 5px 14px;
+  border-radius: 999px;
+  backdrop-filter: blur(6px);
+  white-space: nowrap;
+  letter-spacing: 0.05em;
+}
+
+/* ── Processing spinner overlay ─────────────────────────────── */
+.card-scanner__spinner-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(4, 4, 16, 0.75);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.card-scanner__spinner {
+  width: 42px;
+  height: 42px;
+  border: 3px solid rgba(124, 58, 237, 0.3);
+  border-top-color: #7c3aed;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Status text ────────────────────────────────────────────── */
+.card-scanner__status {
+  font-size: 0.84rem;
+  color: rgba(255, 255, 255, 0.72);
+  text-align: center;
+  margin: 0;
+  min-height: 20px;
+  line-height: 1.5;
+}
+
+/* ── Extracted results ──────────────────────────────────────── */
+.card-scanner__result {
+  background: rgba(124, 58, 237, 0.08);
+  border: 1px solid rgba(124, 58, 237, 0.25);
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.card-scanner__result h3 {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: rgba(255,255,255,0.9);
+  margin: 0 0 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.card-scanner__fields {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.card-scanner__field-row {
+  display: flex;
+  gap: 12px;
+  align-items: baseline;
+}
+
+.card-scanner__field-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: rgba(124, 58, 237, 0.9);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  min-width: 90px;
+  flex-shrink: 0;
+}
+
+.card-scanner__field-value {
+  font-size: 0.88rem;
+  color: rgba(255, 255, 255, 0.88);
+  word-break: break-word;
+}
+
+.card-scanner__text {
+  font-size: 0.82rem;
+  color: rgba(255,255,255,0.75);
+  white-space: pre-wrap;
+  word-break: break-word;
+  margin: 0;
+  font-family: inherit;
+  line-height: 1.6;
+}
+
+/* ── Action buttons ─────────────────────────────────────────── */
+.card-scanner__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+}
+
+.card-scanner__btn {
+  padding: 10px 20px;
+  border-radius: 999px;
+  border: none;
+  font-size: 0.84rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.15s, opacity 0.15s, box-shadow 0.15s;
+  white-space: nowrap;
+}
+
+.card-scanner__btn:hover {
+  transform: translateY(-2px);
+}
+
+.card-scanner__btn:active {
+  transform: translateY(0);
+}
+
+.card-scanner__btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Capture Now — primary */
+.card-scanner__btn--capture {
+  background: linear-gradient(135deg, #7c3aed, #4f46e5);
+  color: #fff;
+  box-shadow: 0 0 18px rgba(124, 58, 237, 0.45);
+}
+
+/* Mirror toggle */
+.card-scanner__btn--mirror {
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+/* Cancel */
+.card-scanner__btn--cancel {
+  background: rgba(239, 68, 68, 0.12);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+/* Use This Data — success */
+.card-scanner__btn--submit {
+  background: linear-gradient(135deg, #059669, #10b981);
+  color: #fff;
+  box-shadow: 0 0 14px rgba(16, 185, 129, 0.35);
+}
+
+/* Retry */
+.card-scanner__btn--retry {
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* ── Responsive ─────────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .card-scanner__container {
+    padding: 16px;
+    border-radius: 16px;
+  }
+
+  .card-scanner__btn {
+    padding: 9px 16px;
+    font-size: 0.8rem;
+  }
+}

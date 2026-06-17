@@ -1,0 +1,199 @@
+/* ── VoiceSession root ────────────────────────────────────────── */
+.voice-session {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-height: 0;
+  position: relative;
+}
+
+/* ── Related image carousel (overlay) ───────────────────────── */
+.voice-session__carousel {
+  position: fixed;
+  inset: 0;
+  z-index: 150;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: auto;
+}
+
+.voice-session__carousel .img-slideshow {
+  height: 100vh;
+  border-radius: 0;
+  box-shadow: none;
+  border: 0;
+  background: #000;
+}
+
+/* ── Pre-session idle panel ───────────────────────────────────── */
+.voice-session__idle {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 28px;
+  padding: 24px;
+  min-height: 0;
+  position: relative;
+  z-index: 5;
+}
+
+.voice-session__idle-logo-container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #000;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 100;
+}
+
+.voice-session__idle-logo {
+  width: 100vw;
+  height: 100vh;
+  object-fit: cover;
+  animation: pulse-glow 4s infinite ease-in-out;
+}
+
+@keyframes pulse-glow {
+  0% { opacity: 0.8; transform: scale(0.98); }
+  50% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0.8; transform: scale(0.98); }
+}
+
+/* ── Active session: small visualizer overlay (centered) ──────── */
+.voice-session__active-ui {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.voice-session__visualizer-wrap {
+  pointer-events: none;
+  opacity: 0.95;
+  /* Scale the visualizer down a bit so background images show better */
+  transform: scale(0.85);
+}
+
+.voice-session__sr-status {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ── Status text ─────────────────────────────────────────────── */
+.voice-session__status {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  text-align: center;
+  max-width: 360px;
+}
+
+.voice-session__controls {
+  display: flex;
+  gap: 12px;
+}
+
+/* ── Session controls overlay (always on top) ─────────────────── */
+.voice-session__overlay {
+  position: absolute;
+  right: 20px;
+  bottom: 20px;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  pointer-events: all;
+}
+
+.voice-session__overlay-status {
+  padding: 8px 14px;
+  border-radius: var(--radius-full);
+  font-size: 0.78rem;
+  color: #fff;
+  background: rgba(6, 6, 15, 0.80);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  max-width: 220px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Buttons ─────────────────────────────────────────────────── */
+.voice-session__btn {
+  padding: 14px 32px;
+  border: none;
+  border-radius: var(--radius-full);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform var(--duration-fast) var(--ease-out),
+    box-shadow var(--duration-fast);
+}
+
+.voice-session__btn--primary {
+  background: var(--gradient-brand);
+  color: white;
+  box-shadow: var(--shadow-glow);
+}
+
+.voice-session__btn--danger {
+  background: rgba(239, 68, 68, 0.18);
+  color: var(--accent-red, #ef4444);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.voice-session__btn:hover {
+  transform: translateY(-2px);
+}
+
+.voice-session__btn:active {
+  transform: translateY(0);
+}
+
+/* ── Responsive ─────────────────────────────────────────────── */
+@media (max-width: 720px) {
+  .voice-session__carousel {
+    inset: 0;
+    width: 100vw;
+  }
+
+  .voice-session__carousel .img-slideshow {
+    height: 100vh;
+  }
+
+  .voice-session__overlay {
+    left: 12px;
+    right: 12px;
+    bottom: 14px;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .voice-session__overlay-status {
+    flex: 1;
+    max-width: none;
+    text-align: left;
+  }
+}
