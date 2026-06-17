@@ -301,7 +301,7 @@ export default function SpeakerAngle({ isActive }) {
         let faceMesh;
         if (window.FaceMesh) {
             faceMesh = new window.FaceMesh({
-                locateFile: (file) => `http://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`
+                locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`
             });
 
             faceMesh.setOptions({
