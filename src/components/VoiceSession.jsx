@@ -146,28 +146,61 @@ export default function VoiceSession() {
         resetInactivityTimer();
       }
     },
+    // onImages: (payload, replace = false) => {
+    //   if (leadMode || cameraActive || awaitingCardScan || detailCollectionMode) {
+    //     console.log("[VoiceSession] Ignoring images during detail/card collection");
+    //     return;
+    //   }
+    //   const list = Array.isArray(payload) ? payload : [];
+    //   console.log("[VoiceSession] onImages received:", list.length, "images", list);
+    //   if (replace) setSyncIndex(null);
+    //   setRagImages((prev) => {
+    //     if (replace) return list;
+    //     const merged = [...(prev || []), ...list];
+    //     const seen = new Set();
+    //     return merged.filter((item) => {
+    //       const key = typeof item === "string"
+    //         ? item
+    //         : item?.url || item?.image_path || "";
+    //       if (!key || seen.has(key)) return false;
+    //       seen.add(key);
+    //       return true;
+    //     });
+    //   });
+    // },
+
     onImages: (payload, replace = false) => {
       if (leadMode || cameraActive || awaitingCardScan || detailCollectionMode) {
         console.log("[VoiceSession] Ignoring images during detail/card collection");
         return;
       }
-      const list = Array.isArray(payload) ? payload : [];
-      console.log("[VoiceSession] onImages received:", list.length, "images", list);
+
+      let list = Array.isArray(payload) ? payload : [];
+
+      console.log("🖼️ Raw images received from backend:", list);
+
+      // ←←← Yeh zaroori hai
+      const backendUrl = import.meta.env.VITE_BACKEND_URL || "https://chatbotnd.iotfiysolutions.com";
+
+      const fullImages = list.map(img => {
+        if (typeof img === "string") {
+          if (img.startsWith("http")) return img;   // already full url
+          return `${backendUrl}${img.startsWith('/') ? '' : '/'}${img}`;
+        }
+        return img;
+      });
+
+      console.log("✅ Final Full Image URLs:", fullImages);
+
       if (replace) setSyncIndex(null);
+
       setRagImages((prev) => {
-        if (replace) return list;
-        const merged = [...(prev || []), ...list];
-        const seen = new Set();
-        return merged.filter((item) => {
-          const key = typeof item === "string"
-            ? item
-            : item?.url || item?.image_path || "";
-          if (!key || seen.has(key)) return false;
-          seen.add(key);
-          return true;
-        });
+        if (replace) return fullImages;
+        const merged = [...(prev || []), ...fullImages];
+        return [...new Set(merged)];   // duplicates remove
       });
     },
+
     onImageSync: (imageId, timestamp) => {
       if (Number.isFinite(imageId)) {
         setSyncIndex(Math.max(imageId - 1, 0));
@@ -316,7 +349,7 @@ Company: ${structuredData?.company || ""}
 Designation: ${structuredData?.designation || structuredData?.jobTitle || ""}
 Phone: ${structuredData?.phone || ""}
 Email: ${structuredData?.email || ""}`;
-      
+
       live.sendText(payloadText);
     }
     setMode("listening");
