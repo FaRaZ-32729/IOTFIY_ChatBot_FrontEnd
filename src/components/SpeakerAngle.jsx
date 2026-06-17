@@ -190,7 +190,7 @@ export default function SpeakerAngle({ isActive }) {
         try {
             console.log(`🔥 Sending Angle to Backend: ${angle}°`);
 
-            const response = await fetch("http://localhost:5000/send-angle", {
+            const response = await fetch("https://chatbotnd.iotfiysolutions.com/send-angle", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

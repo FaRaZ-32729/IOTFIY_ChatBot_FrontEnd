@@ -7,19 +7,20 @@ export default defineConfig({
     port: 5174,
     proxy: {
       "/api": {
-        target: "http://localhost:5000",
+        // target: "http://localhost:5000",
+        target: "https://chatbotnd.iotfiysolutions.com",
         changeOrigin: true,
       },
       "/pdf-images": {
-        target: "http://localhost:5000",
+        target: "https://chatbotnd.iotfiysolutions.com",
         changeOrigin: true,
       },
       "/uploads": {
-        target: "http://localhost:5000",
+        target: "https://chatbotnd.iotfiysolutions.com",
         changeOrigin: true,
       },
       "/live": {
-        target: "ws://localhost:5000",
+        target: "https://chatbotnd.iotfiysolutions.com",
         ws: true,
         changeOrigin: true,
       },
