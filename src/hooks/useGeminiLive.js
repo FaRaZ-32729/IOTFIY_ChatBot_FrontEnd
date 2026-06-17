@@ -1,10 +1,22 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { generateSessionId } from "../utils/helpers.js";
 
+// function getWsUrl(sessionId) {
+//   const proto = window.location.protocol === "https:" ? "wss" : "ws";
+//   const host = import.meta.env.VITE_WS_HOST || window.location.host;
+//   return `${proto}://${host}/live?sessionId=${encodeURIComponent(sessionId)}`;
+// }
+
 function getWsUrl(sessionId) {
-  const proto = window.location.protocol === "https:" ? "wss" : "ws";
-  const host = import.meta.env.VITE_WS_HOST || window.location.host;
-  return `${proto}://${host}/live?sessionId=${encodeURIComponent(sessionId)}`;
+  // ←←← Yeh important change hai
+  const backendUrl = import.meta.env.VITE_BACKEND_URL || "https://chatbotnd.iotfiysolutions.com";
+
+  // Remove trailing slash if any
+  const base = backendUrl.replace(/\/$/, "");
+
+  const wsProto = backendUrl.startsWith("https") ? "wss" : "ws";
+
+  return `${wsProto}://${base.replace(/^https?:\/\//, '')}/live?sessionId=${encodeURIComponent(sessionId)}`;
 }
 
 export function useGeminiLive(handlers = {}) {
