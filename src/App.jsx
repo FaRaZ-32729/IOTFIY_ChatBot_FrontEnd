@@ -8,7 +8,7 @@ export default function App() {
       <VoiceSession />
       <footer className="app__footer">
         <span>
-          Powered by <strong>IOTFIY</strong> &middot;
+          Powered by <strong>IOTFIY</strong> & <strong>NUCLEUS</strong>&middot;
           &copy; {new Date().getFullYear()}
         </span>
       </footer>

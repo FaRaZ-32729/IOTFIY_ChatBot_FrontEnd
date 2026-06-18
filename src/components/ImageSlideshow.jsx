@@ -1,37 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import "./ImageSlideshow.css";
 
-// function normalizeImages(images) {
-//   if (!Array.isArray(images)) return [];
-
-//   return images
-//     .map((item) => {
-//       if (!item) return null;
-//       if (typeof item === "string") {
-//         return { url: item, topic: "", pageNumber: null, pdfName: "" };
-//       }
-
-//       if (typeof item === "object") {
-//         const rawPath = item.url || item.image_path || "";
-//         const url = rawPath
-//           ? rawPath.startsWith("/")
-//             ? rawPath
-//             : `/${rawPath}`
-//           : "";
-//         return {
-//           url,
-//           topic: item.topic || "",
-//           pageNumber: item.page_number || item.pageNumber || null,
-//           pdfName: item.pdf_name || item.pdfName || "",
-//           alt: item.alt || "",
-//         };
-//       }
-
-//       return null;
-//     })
-//     .filter((entry) => entry && entry.url);
-// }
-
 function normalizeImages(images) {
   if (!Array.isArray(images)) return [];
 
