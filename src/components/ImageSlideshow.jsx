@@ -21,7 +21,7 @@ function normalizeImages(images) {
       if (!rawUrl) return null;
 
       // Full URL banao
-      // let finalUrl = rawUrl;
+      let finalUrl = rawUrl;
       // if (!rawUrl.startsWith("http")) {
       //   finalUrl = `${backendUrl}${rawUrl.startsWith('/') ? '' : '/'}${rawUrl}`;
       // }
