@@ -30,7 +30,8 @@ function normalizeImages(images) {
 
       // Agar backend image hai
       if (!rawUrl.startsWith("http") && !rawUrl.startsWith("/")) {
-        finalUrl = `${backendUrl}/${rawUrl}`;
+        // finalUrl = `${backendUrl}/${rawUrl}`;
+        finalUrl = `${backendUrl}${rawUrl.startsWith('/') ? '' : '/'}${rawUrl}`;
       }
 
       return {
