@@ -202,7 +202,7 @@ export default function LeadForm({
           </p>
         )}
 
-        <form
+        {/* <form
           className="lead-form__text-fallback"
           onSubmit={(e) => {
             e.preventDefault();
@@ -213,7 +213,7 @@ export default function LeadForm({
         >
           <input name="fallback" type="text" placeholder="Type correction or details…" />
           <button type="submit">Send</button>
-        </form>
+        </form> */}
 
         <button
           type="button"
