@@ -159,16 +159,57 @@ export default function CardScanner({ onCardScanned, onCancel }) {
       const displayText =
         result?.displayText || result?.text || result?.summary || "";
 
-      if (displayText && displayText.trim().length > 0) {
+      // if (displayText && displayText.trim().length > 0) {
+      //   setStatus("Card scanned successfully! Sending to Gravitas...");
+
+      //   // Give the user a moment to see the success message
+      //   setTimeout(() => {
+      //     const structuredData = {
+      //       firstName: result.firstName || "",
+      //       lastName: result.lastName || "",
+      //       fullName: result.fullName || "",
+      //       phone: normalizeToArray(result.phone),
+      //       email: normalizeToArray(result.email),
+      //       company: result.company || "",
+      //       designation: result.designation || result.jobTitle || "",
+      //       address: result.address || "",
+      //       jobTitle: result.jobTitle || "",
+      //     };
+      //     onCardScanned(displayText, structuredData);
+      //   }, 1500);
+      // } else {
+      //   setScanResult(null);
+      //   setStatus(
+      //     "No data extracted. Restarting camera..."
+      //   );
+      //   setTimeout(() => {
+      //     startCamera();
+      //   }, 2000);
+      // }
+      setIsProcessing(false);
+
+      const hasMeaningfulData =
+        result?.noData !== true &&
+        Boolean(
+          result?.fullName ||
+          result?.firstName ||
+          result?.lastName ||
+          (Array.isArray(result?.phone) ? result.phone.length : result?.phone) ||
+          (Array.isArray(result?.email) ? result.email.length : result?.email)
+        );
+
+      if (hasMeaningfulData) {
+        const displayText =
+          result?.displayText || result?.text || result?.summary || "";
+
         setStatus("Card scanned successfully! Sending to Gravitas...");
 
-        // Give the user a moment to see the success message
         setTimeout(() => {
           const structuredData = {
             firstName: result.firstName || "",
             lastName: result.lastName || "",
             fullName: result.fullName || "",
-            phone: normalizeToArray(result.phone),     // 👈 ab array
+            phone: normalizeToArray(result.phone),
             email: normalizeToArray(result.email),
             company: result.company || "",
             designation: result.designation || result.jobTitle || "",
@@ -179,9 +220,7 @@ export default function CardScanner({ onCardScanned, onCancel }) {
         }, 1500);
       } else {
         setScanResult(null);
-        setStatus(
-          "No data extracted. Restarting camera..."
-        );
+        setStatus("Card not detected clearly. Reopening camera to rescan...");
         setTimeout(() => {
           startCamera();
         }, 2000);
@@ -308,3 +347,5 @@ export default function CardScanner({ onCardScanned, onCancel }) {
     </div>
   );
 }
+
+

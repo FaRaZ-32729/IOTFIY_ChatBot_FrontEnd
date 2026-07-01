@@ -413,47 +413,6 @@ Email: ${emailText}`;
     setLeadMode(true);
   }, []);
 
-  // const handleSaveLead = useCallback(async () => {
-  //   const payload = {
-  //     name: leadFields.name?.trim() || "",
-  //     company: leadFields.company?.trim() || "",
-  //     designation: leadFields.designation?.trim() || "",
-  //     phone: leadFields.phone?.trim() || "",
-  //     email: leadFields.email?.trim() || "",
-  //     sessionId: live.sessionId,
-  //   };
-
-  //   if (leadSaving) return;
-
-  //   if (!payload.name || !payload.phone || !payload.email) {
-  //     setStatusText("Name, Phone, and Email are required.");
-  //     return;
-  //   }
-
-  //   // Basic validation
-  //   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  //   if (!emailRegex.test(payload.email)) {
-  //     setStatusText("Please enter a valid email address.");
-  //     return;
-  //   }
-
-  //   try {
-  //     setLeadSaving(true);
-  //     setStatusText("Saving lead details...");
-  //     await saveLeadDetails(payload);
-  //     setStatusText("Lead saved. Thank you! Ending session...");
-  //     setLeadMode(false);
-  //     resetInactivityTimer();
-  //     setTimeout(() => {
-  //       stopSessionRef.current?.();
-  //     }, 1200);
-  //   } catch (err) {
-  //     setStatusText(err?.message || "Could not save details. Please try again.");
-  //   } finally {
-  //     setLeadSaving(false);
-  //   }
-  // }, [leadFields, leadSaving, live.sessionId, resetInactivityTimer]);
-
   const handleSaveLead = useCallback(async () => {
   const phoneArr = (Array.isArray(leadFields.phone) ? leadFields.phone : [leadFields.phone])
     .map((p) => String(p || "").trim())
@@ -501,6 +460,7 @@ Email: ${emailText}`;
     setStatusText("Lead saved. Thank you! Ending session...");
     setLeadMode(false);
     resetInactivityTimer();
+     mic.stop();
     setTimeout(() => {
       stopSessionRef.current?.();
     }, 1200);
