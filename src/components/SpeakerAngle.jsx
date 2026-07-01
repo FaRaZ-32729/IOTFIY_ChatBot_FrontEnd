@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import "./SpeakerAngle.css";
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "https://chatbotnd.iotfiysolutions.com";
 
 
 export default function SpeakerAngle({ isActive }) {

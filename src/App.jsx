@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import VoiceSession from "./components/VoiceSession.jsx";
 import "./App.css";
 import Admin from "./components/Admin.jsx";
-import { Route } from "react-router-dom";
 
 export default function App() {
   const [route, setRoute] = useState(window.location.hash);

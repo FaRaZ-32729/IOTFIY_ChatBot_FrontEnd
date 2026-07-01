@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import "./Admin.css";
 
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "https://chatbotnd.iotfiysolutions.com";
 
 // Map ya plain object dono handle karo
 function normalizeTopicCounts(topic_counts) {
