@@ -220,7 +220,7 @@ export default function Admin() {
         </header>
 
         {/* Stats row */}
-        {leads.length > 0 && (
+        {/* {leads.length > 0 && (
           <div className="admin-stats-row">
             <div className="admin-stat-card">
               <span className="admin-stat-value">{leads.length}</span>
@@ -239,7 +239,7 @@ export default function Admin() {
               <span className="admin-stat-label">Unique Topics</span>
             </div>
           </div>
-        )}
+        )} */}
 
         <div className="table-container glass">
           {loading && !leads.length ? (
