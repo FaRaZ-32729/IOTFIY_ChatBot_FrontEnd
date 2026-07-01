@@ -21,17 +21,27 @@ function normalizeImages(images) {
       if (!rawUrl) return null;
 
       // Full URL banao
-      let finalUrl = rawUrl;
-      if (!rawUrl.startsWith("http")) {
-        finalUrl = `${backendUrl}${rawUrl.startsWith('/') ? '' : '/'}${rawUrl}`;
-      }
-
       // let finalUrl = rawUrl;
-
-      // // Agar backend image hai
-      // if (!rawUrl.startsWith("http") && !rawUrl.startsWith("/")) {
-      //   finalUrl = `${backendUrl}/${rawUrl}`;
+      // if (!rawUrl.startsWith("http")) {
+      //   finalUrl = `${backendUrl}${rawUrl.startsWith('/') ? '' : '/'}${rawUrl}`;
       // }
+
+      const publicAssets = [
+        "/IOTFIY.jpeg",
+      ];
+
+      // Agar ye frontend ki public image hai
+      if (publicAssets.includes(rawUrl)) {
+        finalUrl = rawUrl;
+      }
+      // Agar already full URL hai
+      else if (rawUrl.startsWith("http")) {
+        finalUrl = rawUrl;
+      }
+      // Warna backend image hai
+      else {
+        finalUrl = `${backendUrl}${rawUrl.startsWith("/") ? "" : "/"}${rawUrl}`;
+      }
 
       return {
         url: finalUrl,
