@@ -22,7 +22,8 @@ export default function VoiceSession() {
   const [mode, setMode] = useState("idle");
 
   // RAG-retrieved images shown in a horizontal carousel
-  const [ragImages, setRagImages] = useState([]);
+  // const [ragImages, setRagImages] = useState([]);
+  const [ragImages, setRagImages] = useState([{ url: "/IOTFIY.jpeg", alt: "IoTFIY" }]);
   const [syncIndex, setSyncIndex] = useState(null);
 
   const [leadMode, setLeadMode] = useState(false);
@@ -146,22 +147,45 @@ export default function VoiceSession() {
         resetInactivityTimer();
       }
     },
+    // onImages: (payload, replace = false) => {
+    //   if (leadMode || cameraActive || awaitingCardScan || detailCollectionMode) {
+    //     console.log("[VoiceSession] Ignoring images during detail/card collection");
+    //     return;
+    //   }
+    //   const list = Array.isArray(payload) ? payload : [];
+    //   console.log("[VoiceSession] onImages received:", list.length, "images", list);
+    //   if (replace) setSyncIndex(null);
+    //   setRagImages((prev) => {
+    //     if (replace) return list;
+    //     const merged = [...(prev || []), ...list];
+    //     const seen = new Set();
+    //     return merged.filter((item) => {
+    //       const key = typeof item === "string"
+    //         ? item
+    //         : item?.url || item?.image_path || "";
+    //       if (!key || seen.has(key)) return false;
+    //       seen.add(key);
+    //       return true;
+    //     });
+    //   });
+    // },
     onImages: (payload, replace = false) => {
-      if (leadMode || cameraActive || awaitingCardScan || detailCollectionMode) {
-        console.log("[VoiceSession] Ignoring images during detail/card collection");
-        return;
-      }
+      if (leadMode || cameraActive || awaitingCardScan || detailCollectionMode) return;
+
       const list = Array.isArray(payload) ? payload : [];
-      console.log("[VoiceSession] onImages received:", list.length, "images", list);
+
+      if (!list.length) return; // empty pe default ko mat hatao
+
       if (replace) setSyncIndex(null);
       setRagImages((prev) => {
         if (replace) return list;
-        const merged = [...(prev || []), ...list];
+        // Pehle se sirf default image thi — replace karo
+        const isOnlyDefault = prev.length === 1 && prev[0]?.url === "/IOTFIY.jpeg";
+        const base = isOnlyDefault ? [] : prev;
+        const merged = [...base, ...list];
         const seen = new Set();
         return merged.filter((item) => {
-          const key = typeof item === "string"
-            ? item
-            : item?.url || item?.image_path || "";
+          const key = typeof item === "string" ? item : item?.url || item?.image_path || "";
           if (!key || seen.has(key)) return false;
           seen.add(key);
           return true;
@@ -414,62 +438,62 @@ Email: ${emailText}`;
   }, []);
 
   const handleSaveLead = useCallback(async () => {
-  const phoneArr = (Array.isArray(leadFields.phone) ? leadFields.phone : [leadFields.phone])
-    .map((p) => String(p || "").trim())
-    .filter(Boolean);
-  const emailArr = (Array.isArray(leadFields.email) ? leadFields.email : [leadFields.email])
-    .map((e) => String(e || "").trim())
-    .filter(Boolean);
+    const phoneArr = (Array.isArray(leadFields.phone) ? leadFields.phone : [leadFields.phone])
+      .map((p) => String(p || "").trim())
+      .filter(Boolean);
+    const emailArr = (Array.isArray(leadFields.email) ? leadFields.email : [leadFields.email])
+      .map((e) => String(e || "").trim())
+      .filter(Boolean);
 
-  const payload = {
-    name: leadFields.name?.trim() || "",
-    company: leadFields.company?.trim() || "",
-    designation: leadFields.designation?.trim() || "",
-    phone: phoneArr,
-    email: emailArr,
-    sessionId: live.sessionId,
-  };
+    const payload = {
+      name: leadFields.name?.trim() || "",
+      company: leadFields.company?.trim() || "",
+      designation: leadFields.designation?.trim() || "",
+      phone: phoneArr,
+      email: emailArr,
+      sessionId: live.sessionId,
+    };
 
-  if (leadSaving) return;
+    if (leadSaving) return;
 
-  if (!payload.name || !phoneArr.length || !emailArr.length) {
-    setStatusText("Name, Phone, and Email are required.");
-    return;
-  }
+    if (!payload.name || !phoneArr.length || !emailArr.length) {
+      setStatusText("Name, Phone, and Email are required.");
+      return;
+    }
 
-  // Basic validation — sab emails check karo
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  const invalidEmail = emailArr.find((e) => !emailRegex.test(e));
-  if (invalidEmail) {
-    setStatusText(`Please enter a valid email address (invalid: "${invalidEmail}").`);
-    return;
-  }
+    // Basic validation — sab emails check karo
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const invalidEmail = emailArr.find((e) => !emailRegex.test(e));
+    if (invalidEmail) {
+      setStatusText(`Please enter a valid email address (invalid: "${invalidEmail}").`);
+      return;
+    }
 
-  // Basic phone sanity check (kam se kam 7 digits)
-  const phoneDigitsRegex = /\d{7,}/;
-  const invalidPhone = phoneArr.find((p) => !phoneDigitsRegex.test(p));
-  if (invalidPhone) {
-    setStatusText(`Please enter a valid phone number (invalid: "${invalidPhone}").`);
-    return;
-  }
+    // Basic phone sanity check (kam se kam 7 digits)
+    const phoneDigitsRegex = /\d{7,}/;
+    const invalidPhone = phoneArr.find((p) => !phoneDigitsRegex.test(p));
+    if (invalidPhone) {
+      setStatusText(`Please enter a valid phone number (invalid: "${invalidPhone}").`);
+      return;
+    }
 
-  try {
-    setLeadSaving(true);
-    setStatusText("Saving lead details...");
-    await saveLeadDetails(payload);
-    setStatusText("Lead saved. Thank you! Ending session...");
-    setLeadMode(false);
-    resetInactivityTimer();
-     mic.stop();
-    setTimeout(() => {
-      stopSessionRef.current?.();
-    }, 1200);
-  } catch (err) {
-    setStatusText(err?.message || "Could not save details. Please try again.");
-  } finally {
-    setLeadSaving(false);
-  }
-}, [leadFields, leadSaving, live.sessionId, resetInactivityTimer]);
+    try {
+      setLeadSaving(true);
+      setStatusText("Saving lead details...");
+      await saveLeadDetails(payload);
+      setStatusText("Lead saved. Thank you! Ending session...");
+      setLeadMode(false);
+      resetInactivityTimer();
+      mic.stop();
+      setTimeout(() => {
+        stopSessionRef.current?.();
+      }, 1200);
+    } catch (err) {
+      setStatusText(err?.message || "Could not save details. Please try again.");
+    } finally {
+      setLeadSaving(false);
+    }
+  }, [leadFields, leadSaving, live.sessionId, resetInactivityTimer]);
 
   const playbackTick = useCallback(() => {
     if (sessionActive && mode === "speaking" && !isPlaying()) {
@@ -490,9 +514,13 @@ Email: ${emailText}`;
   const hasImages = displayImages.length > 0;
 
   // Keep retrieved visuals full-screen for the whole live session.
-  const suppressImages =
-    detailCollectionMode || leadMode || cameraActive || awaitingCardScan;
-  const showCarousel = sessionActive && hasImages && !suppressImages;
+  // const suppressImages =
+  //   detailCollectionMode || leadMode || cameraActive || awaitingCardScan;
+  // const showCarousel = sessionActive && hasImages && !suppressImages;
+
+  const suppressImages = detailCollectionMode || leadMode || cameraActive || awaitingCardScan;
+  const showCarousel = sessionActive && !suppressImages;
+
 
   const startSession = useCallback(async (matchedKeyword) => {
     if (sessionActive) return;
@@ -545,7 +573,8 @@ Email: ${emailText}`;
     isSpeakingThisTurnRef.current = false;
     setSessionActive(false);
     setMode("idle");
-    setRagImages([]);
+    // setRagImages([]);
+    setRagImages([{ url: "/IOTFIY.jpeg", alt: "IoTFIY" }]);
     setSyncIndex(null);
     setLeadMode(false);
     setDetailCollectionMode(false);

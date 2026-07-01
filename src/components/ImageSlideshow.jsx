@@ -21,9 +21,16 @@ function normalizeImages(images) {
       if (!rawUrl) return null;
 
       // Full URL banao
+      // let finalUrl = rawUrl;
+      // if (!rawUrl.startsWith("http")) {
+      //   finalUrl = `${backendUrl}${rawUrl.startsWith('/') ? '' : '/'}${rawUrl}`;
+      // }
+
       let finalUrl = rawUrl;
-      if (!rawUrl.startsWith("http")) {
-        finalUrl = `${backendUrl}${rawUrl.startsWith('/') ? '' : '/'}${rawUrl}`;
+
+      // Agar backend image hai
+      if (!rawUrl.startsWith("http") && !rawUrl.startsWith("/")) {
+        finalUrl = `${backendUrl}/${rawUrl}`;
       }
 
       return {
