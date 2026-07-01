@@ -22,9 +22,21 @@ export default function LeadForm({
     (fields.email ? 1 : 0);
   const totalFields = 5;
 
-  // Basic validation helpers
-  const emailValid = !fields.email || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fields.email);
-  const phoneValid = !fields.phone || /^[\d\s\-+().]{7,20}$/.test(fields.phone);
+  // 👇 NAYA: comma-separated multiple values ko split karke har ek ko validate karo
+  const splitValues = (str) =>
+    String(str || "")
+      .split(",")
+      .map((v) => v.trim())
+      .filter(Boolean);
+
+  const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const PHONE_RE = /^[\d\s\-+().]{7,20}$/;
+
+  const emailParts = splitValues(fields.email);
+  const phoneParts = splitValues(fields.phone);
+
+  const emailValid = emailParts.length === 0 || emailParts.every((e) => EMAIL_RE.test(e));
+  const phoneValid = phoneParts.length === 0 || phoneParts.every((p) => PHONE_RE.test(p));
 
   return (
     <div className="lead-form-overlay" id="lead-form-overlay" role="dialog" aria-label="Lead information">
@@ -51,8 +63,8 @@ export default function LeadForm({
         </div>
         <p className="lead-form__hint">
           {hasRequiredFields
-            ? "Please review your details below. Use the text box to make corrections."
-            : "Fields update as you speak. Use the text box for email if needed."}
+            ? "Please review your details below. Use commas to add multiple phone numbers or emails."
+            : "Fields update as you speak. Use commas to add multiple phone numbers or emails."}
         </p>
 
         <div className="lead-form__fields">
@@ -123,13 +135,13 @@ export default function LeadForm({
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z" />
               </svg>
-              Phone Number
+              Phone Number(s)
             </span>
             <input
-              type="tel"
+              type="text"
               value={fields.phone}
               onChange={(e) => onFieldChange("phone", e.target.value)}
-              placeholder="Phone number"
+              placeholder="Phone number(s), comma separated"
               id="lead-field-phone"
             />
             {fields.phone && (
@@ -146,13 +158,13 @@ export default function LeadForm({
                 <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
                 <polyline points="22,6 12,13 2,6" />
               </svg>
-              Email
+              Email(s)
             </span>
             <input
-              type="email"
+              type="text"
               value={fields.email}
               onChange={(e) => onFieldChange("email", e.target.value)}
-              placeholder="email@example.com"
+              placeholder="email(s), comma separated"
               id="lead-field-email"
             />
             {fields.email && (
@@ -180,10 +192,14 @@ export default function LeadForm({
 
         {/* Validation hints */}
         {fields.email && !emailValid && (
-          <p className="lead-form__validation-error">Please enter a valid email address</p>
+          <p className="lead-form__validation-error">
+            Please enter valid email address(es), separated by commas if more than one.
+          </p>
         )}
         {fields.phone && !phoneValid && (
-          <p className="lead-form__validation-error">Please enter a valid phone number</p>
+          <p className="lead-form__validation-error">
+            Please enter valid phone number(s), separated by commas if more than one.
+          </p>
         )}
 
         <form

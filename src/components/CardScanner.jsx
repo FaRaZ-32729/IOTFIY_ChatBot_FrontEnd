@@ -5,6 +5,23 @@ import "./CardScanner.css";
 // Auto-capture delay (ms) after camera focus stabilises
 const AUTO_CAPTURE_DELAY = 5000;
 
+// CardScanner.jsx ke top par, component se bahar ek helper add karo
+function normalizeToArray(value) {
+  if (!value) return [];
+  if (Array.isArray(value)) {
+    return [...new Set(value.map((v) => String(v).trim()).filter(Boolean))];
+  }
+  // Mindee kabhi "03001234567, 03009876543" jaisa bhi bhej sakta hai
+  return [
+    ...new Set(
+      String(value)
+        .split(/[,;]|(?:\s+and\s+)/i)
+        .map((v) => v.trim())
+        .filter(Boolean)
+    ),
+  ];
+}
+
 export default function CardScanner({ onCardScanned, onCancel }) {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
@@ -46,7 +63,7 @@ export default function CardScanner({ onCardScanned, onCancel }) {
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
         videoRef.current.onloadedmetadata = () => {
-          videoRef.current.play().catch(() => {});
+          videoRef.current.play().catch(() => { });
           setStreamActive(true);
           setStatus("Camera ready — align the card and wait for auto-capture, or tap Capture Now.");
           scheduleAutoCapture();
@@ -144,15 +161,15 @@ export default function CardScanner({ onCardScanned, onCancel }) {
 
       if (displayText && displayText.trim().length > 0) {
         setStatus("Card scanned successfully! Sending to Gravitas...");
-        
+
         // Give the user a moment to see the success message
         setTimeout(() => {
           const structuredData = {
             firstName: result.firstName || "",
             lastName: result.lastName || "",
             fullName: result.fullName || "",
-            phone: result.phone || "",
-            email: result.email || "",
+            phone: normalizeToArray(result.phone),     // 👈 ab array
+            email: normalizeToArray(result.email),
             company: result.company || "",
             designation: result.designation || result.jobTitle || "",
             address: result.address || "",
@@ -252,7 +269,9 @@ export default function CardScanner({ onCardScanned, onCancel }) {
                 {scanResult.fields.map((field) => (
                   <div key={field.key} className="card-scanner__field-row">
                     <span className="card-scanner__field-label">{field.label}</span>
-                    <span className="card-scanner__field-value">{field.value}</span>
+                    <span className="card-scanner__field-value">
+                      {Array.isArray(field.value) ? field.value.join(", ") : field.value}
+                    </span>
                   </div>
                 ))}
               </div>

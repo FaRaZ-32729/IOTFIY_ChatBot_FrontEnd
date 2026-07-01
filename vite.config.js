@@ -8,19 +8,19 @@ export default defineConfig({
     proxy: {
       "/api": {
         // target: "http://localhost:5000",
-        target: "https://chatbotnd.iotfiysolutions.com",
+        target: "http://localhost:5055",
         changeOrigin: true,
       },
       "/pdf-images": {
-        target: "https://chatbotnd.iotfiysolutions.com",
+        target: "http://localhost:5055",
         changeOrigin: true,
       },
       "/uploads": {
-        target: "https://chatbotnd.iotfiysolutions.com",
+        target: "http://localhost:5055",
         changeOrigin: true,
       },
       "/live": {
-        target: "https://chatbotnd.iotfiysolutions.com",
+        target: "http://localhost:5055",
         ws: true,
         changeOrigin: true,
       },

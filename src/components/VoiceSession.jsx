@@ -272,6 +272,56 @@ export default function VoiceSession() {
   const mic = useMicrophone(onAudioChunk, onLevel);
 
   // Handler for card scanner completion — auto-populate fields from structured data
+  //   const handleCardScanned = useCallback((ocrText, structuredData) => {
+  //     setDetailCollectionMode(true);
+  //     setRagImages([]);
+  //     setSyncIndex(null);
+  //     setCameraActive(false);
+  //     setAwaitingCardScan(false);
+
+  //     // Auto-populate lead fields from structured card data if available
+  //     if (structuredData) {
+  //       const extractedName = [structuredData.firstName, structuredData.lastName]
+  //         .filter(Boolean).join(" ").trim() || structuredData.fullName || "";
+
+  //       setLeadFields(prev => ({
+  //         ...prev,
+  //         name: extractedName || prev.name,
+  //         company: structuredData.company || prev.company,
+  //         designation: structuredData.designation || structuredData.jobTitle || prev.designation,
+  //         phone: structuredData.phone || prev.phone,
+  //         email: structuredData.email || prev.email,
+  //       }));
+
+  //       // Show the form immediately with extracted data
+  //       setLeadMode(true);
+  //       console.log("[VoiceSession] Card data auto-populated:", {
+  //         name: extractedName,
+  //         company: structuredData.company,
+  //         designation: structuredData.designation || structuredData.jobTitle,
+  //         phone: structuredData.phone,
+  //         email: structuredData.email,
+  //       });
+  //     }
+
+  //     // Also send the structured text to Gemini for confirmation
+  //     if (live.sendText) {
+  //       const payloadText = `[CARD_SCANNED]
+  // Raw Text:
+  // ${ocrText || "N/A"}
+
+  // Extracted Data:
+  // Name: ${structuredData?.fullName || [structuredData?.firstName, structuredData?.lastName].filter(Boolean).join(" ") || ""}
+  // Company: ${structuredData?.company || ""}
+  // Designation: ${structuredData?.designation || structuredData?.jobTitle || ""}
+  // Phone: ${structuredData?.phone || ""}
+  // Email: ${structuredData?.email || ""}`;
+
+  //       live.sendText(payloadText);
+  //     }
+  //     setMode("listening");
+  //   }, [live]);
+
   const handleCardScanned = useCallback((ocrText, structuredData) => {
     setDetailCollectionMode(true);
     setRagImages([]);
@@ -284,14 +334,31 @@ export default function VoiceSession() {
       const extractedName = [structuredData.firstName, structuredData.lastName]
         .filter(Boolean).join(" ").trim() || structuredData.fullName || "";
 
-      setLeadFields(prev => ({
-        ...prev,
-        name: extractedName || prev.name,
-        company: structuredData.company || prev.company,
-        designation: structuredData.designation || structuredData.jobTitle || prev.designation,
-        phone: structuredData.phone || prev.phone,
-        email: structuredData.email || prev.email,
-      }));
+      // structuredData.phone / .email ab arrays hain (CardScanner.jsx normalizeToArray se)
+      const extractedPhones = Array.isArray(structuredData.phone)
+        ? structuredData.phone
+        : (structuredData.phone ? [structuredData.phone] : []);
+      const extractedEmails = Array.isArray(structuredData.email)
+        ? structuredData.email
+        : (structuredData.email ? [structuredData.email] : []);
+
+      setLeadFields(prev => {
+        const prevPhones = Array.isArray(prev.phone) ? prev.phone : (prev.phone ? [prev.phone] : []);
+        const prevEmails = Array.isArray(prev.email) ? prev.email : (prev.email ? [prev.email] : []);
+
+        return {
+          ...prev,
+          name: extractedName || prev.name,
+          company: structuredData.company || prev.company,
+          designation: structuredData.designation || structuredData.jobTitle || prev.designation,
+          phone: extractedPhones.length
+            ? [...new Set([...prevPhones, ...extractedPhones])]
+            : prevPhones,
+          email: extractedEmails.length
+            ? [...new Set([...prevEmails, ...extractedEmails])]
+            : prevEmails,
+        };
+      });
 
       // Show the form immediately with extracted data
       setLeadMode(true);
@@ -299,13 +366,20 @@ export default function VoiceSession() {
         name: extractedName,
         company: structuredData.company,
         designation: structuredData.designation || structuredData.jobTitle,
-        phone: structuredData.phone,
-        email: structuredData.email,
+        phone: extractedPhones,
+        email: extractedEmails,
       });
     }
 
     // Also send the structured text to Gemini for confirmation
     if (live.sendText) {
+      const phoneText = Array.isArray(structuredData?.phone)
+        ? structuredData.phone.join(", ")
+        : (structuredData?.phone || "");
+      const emailText = Array.isArray(structuredData?.email)
+        ? structuredData.email.join(", ")
+        : (structuredData?.email || "");
+
       const payloadText = `[CARD_SCANNED]
 Raw Text:
 ${ocrText || "N/A"}
@@ -314,9 +388,9 @@ Extracted Data:
 Name: ${structuredData?.fullName || [structuredData?.firstName, structuredData?.lastName].filter(Boolean).join(" ") || ""}
 Company: ${structuredData?.company || ""}
 Designation: ${structuredData?.designation || structuredData?.jobTitle || ""}
-Phone: ${structuredData?.phone || ""}
-Email: ${structuredData?.email || ""}`;
-      
+Phone: ${phoneText}
+Email: ${emailText}`;
+
       live.sendText(payloadText);
     }
     setMode("listening");
@@ -339,46 +413,103 @@ Email: ${structuredData?.email || ""}`;
     setLeadMode(true);
   }, []);
 
+  // const handleSaveLead = useCallback(async () => {
+  //   const payload = {
+  //     name: leadFields.name?.trim() || "",
+  //     company: leadFields.company?.trim() || "",
+  //     designation: leadFields.designation?.trim() || "",
+  //     phone: leadFields.phone?.trim() || "",
+  //     email: leadFields.email?.trim() || "",
+  //     sessionId: live.sessionId,
+  //   };
+
+  //   if (leadSaving) return;
+
+  //   if (!payload.name || !payload.phone || !payload.email) {
+  //     setStatusText("Name, Phone, and Email are required.");
+  //     return;
+  //   }
+
+  //   // Basic validation
+  //   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  //   if (!emailRegex.test(payload.email)) {
+  //     setStatusText("Please enter a valid email address.");
+  //     return;
+  //   }
+
+  //   try {
+  //     setLeadSaving(true);
+  //     setStatusText("Saving lead details...");
+  //     await saveLeadDetails(payload);
+  //     setStatusText("Lead saved. Thank you! Ending session...");
+  //     setLeadMode(false);
+  //     resetInactivityTimer();
+  //     setTimeout(() => {
+  //       stopSessionRef.current?.();
+  //     }, 1200);
+  //   } catch (err) {
+  //     setStatusText(err?.message || "Could not save details. Please try again.");
+  //   } finally {
+  //     setLeadSaving(false);
+  //   }
+  // }, [leadFields, leadSaving, live.sessionId, resetInactivityTimer]);
+
   const handleSaveLead = useCallback(async () => {
-    const payload = {
-      name: leadFields.name?.trim() || "",
-      company: leadFields.company?.trim() || "",
-      designation: leadFields.designation?.trim() || "",
-      phone: leadFields.phone?.trim() || "",
-      email: leadFields.email?.trim() || "",
-      sessionId: live.sessionId,
-    };
+  const phoneArr = (Array.isArray(leadFields.phone) ? leadFields.phone : [leadFields.phone])
+    .map((p) => String(p || "").trim())
+    .filter(Boolean);
+  const emailArr = (Array.isArray(leadFields.email) ? leadFields.email : [leadFields.email])
+    .map((e) => String(e || "").trim())
+    .filter(Boolean);
 
-    if (leadSaving) return;
+  const payload = {
+    name: leadFields.name?.trim() || "",
+    company: leadFields.company?.trim() || "",
+    designation: leadFields.designation?.trim() || "",
+    phone: phoneArr,
+    email: emailArr,
+    sessionId: live.sessionId,
+  };
 
-    if (!payload.name || !payload.phone || !payload.email) {
-      setStatusText("Name, Phone, and Email are required.");
-      return;
-    }
+  if (leadSaving) return;
 
-    // Basic validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(payload.email)) {
-      setStatusText("Please enter a valid email address.");
-      return;
-    }
+  if (!payload.name || !phoneArr.length || !emailArr.length) {
+    setStatusText("Name, Phone, and Email are required.");
+    return;
+  }
 
-    try {
-      setLeadSaving(true);
-      setStatusText("Saving lead details...");
-      await saveLeadDetails(payload);
-      setStatusText("Lead saved. Thank you! Ending session...");
-      setLeadMode(false);
-      resetInactivityTimer();
-      setTimeout(() => {
-        stopSessionRef.current?.();
-      }, 1200);
-    } catch (err) {
-      setStatusText(err?.message || "Could not save details. Please try again.");
-    } finally {
-      setLeadSaving(false);
-    }
-  }, [leadFields, leadSaving, live.sessionId, resetInactivityTimer]);
+  // Basic validation — sab emails check karo
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const invalidEmail = emailArr.find((e) => !emailRegex.test(e));
+  if (invalidEmail) {
+    setStatusText(`Please enter a valid email address (invalid: "${invalidEmail}").`);
+    return;
+  }
+
+  // Basic phone sanity check (kam se kam 7 digits)
+  const phoneDigitsRegex = /\d{7,}/;
+  const invalidPhone = phoneArr.find((p) => !phoneDigitsRegex.test(p));
+  if (invalidPhone) {
+    setStatusText(`Please enter a valid phone number (invalid: "${invalidPhone}").`);
+    return;
+  }
+
+  try {
+    setLeadSaving(true);
+    setStatusText("Saving lead details...");
+    await saveLeadDetails(payload);
+    setStatusText("Lead saved. Thank you! Ending session...");
+    setLeadMode(false);
+    resetInactivityTimer();
+    setTimeout(() => {
+      stopSessionRef.current?.();
+    }, 1200);
+  } catch (err) {
+    setStatusText(err?.message || "Could not save details. Please try again.");
+  } finally {
+    setLeadSaving(false);
+  }
+}, [leadFields, leadSaving, live.sessionId, resetInactivityTimer]);
 
   const playbackTick = useCallback(() => {
     if (sessionActive && mode === "speaking" && !isPlaying()) {
@@ -460,7 +591,7 @@ Email: ${structuredData?.email || ""}`;
     setDetailCollectionMode(false);
     setCameraActive(false);
     setAwaitingCardScan(false);
-    setLeadFields({ name: "", company: "", designation: "", phone: "", email: "" });
+    setLeadFields({ name: "", company: "", designation: "", phone: [], email: [] });
     setStatusText("Session ended");
   }, [mic, live, stopAll, resetInactivityTimer]);
 
